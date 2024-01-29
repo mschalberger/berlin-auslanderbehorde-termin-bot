@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
 
 
 system = system()
@@ -26,7 +27,7 @@ class WebDriver:
         # some stuff that prevents us from being locked out
         options = webdriver.ChromeOptions() 
         options.add_argument('--disable-blink-features=AutomationControlled')
-        self._driver = webdriver.Chrome(options=options)
+        self._driver = webdriver.Chrome('/Users/mschalberger/Desktop/berlin-auslanderbehorde-termin-bot/chromedriver',options=options)
         self._driver.implicitly_wait(self._implicit_wait_time) # seconds
         self._driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         self._driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
@@ -60,9 +61,9 @@ class BerlinBot:
     @staticmethod
     def enter_form(driver: webdriver.Chrome):
         logging.info("Fill out form")
-        # select china
+        # select mexiko
         s = Select(driver.find_element(By.ID, 'xi-sel-400'))
-        s.select_by_visible_text("China")
+        s.select_by_visible_text("Mexiko")
         # eine person
         s = Select(driver.find_element(By.ID, 'xi-sel-422'))
         s.select_by_visible_text("eine Person")
@@ -75,12 +76,12 @@ class BerlinBot:
         driver.find_element(By.XPATH, '//*[@id="xi-div-30"]/div[2]/label/p').click()
         time.sleep(2)
 
-        # click on study group
-        driver.find_element(By.XPATH, '//*[@id="inner-479-0-2"]/div/div[1]/label/p').click()
+        # click on work
+        driver.find_element(By.XPATH, '//*[@id="inner-353-0-2"]/div/div[3]/label').click()
         time.sleep(2)
 
-        # b/c of stufy
-        driver.find_element(By.XPATH, '//*[@id="inner-479-0-2"]/div/div[2]/div/div[5]/label').click()
+        # b/c of 18b
+        driver.find_element(By.XPATH, '//*[@id="inner-353-0-2"]/div/div[4]/div/div[1]/label').click()
         time.sleep(4)
 
         # submit form
@@ -112,7 +113,7 @@ class BerlinBot:
 
     def run_loop(self):
         # play sound to check if it works
-        self._play_sound_osx(self._sound_file)
+        #self._play_sound_osx(self._sound_file)
         while True:
             logging.info("One more round")
             self.run_once()
@@ -151,4 +152,10 @@ class BerlinBot:
             sleep(nssound.duration())
 
 if __name__ == "__main__":
-    BerlinBot().run_loop()
+    try:
+        BerlinBot().run_loop()
+    except NoSuchElementException as e:
+        logging.error(f"NoSuchElementException occurred: {str(e)}")
+        logging.info("Restarting the script in 10 seconds...")
+        time.sleep(10)
+        BerlinBot().run_loop()
