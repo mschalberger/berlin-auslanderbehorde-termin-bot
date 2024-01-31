@@ -64,13 +64,15 @@ class BerlinBot:
         # select mexiko
         s = Select(driver.find_element(By.ID, 'xi-sel-400'))
         s.select_by_visible_text("Mexiko")
+        time.sleep(7)
         # eine person
         s = Select(driver.find_element(By.ID, 'xi-sel-422'))
         s.select_by_visible_text("eine Person")
+        time.sleep(4)
         # no family
         s = Select(driver.find_element(By.ID, 'xi-sel-427' ))
         s.select_by_visible_text("nein")
-        time.sleep(5)
+        time.sleep(8)
 
         # extend stay
         driver.find_element(By.XPATH, '//*[@id="xi-div-30"]/div[2]/label/p').click()
@@ -152,10 +154,4 @@ class BerlinBot:
             sleep(nssound.duration())
 
 if __name__ == "__main__":
-    try:
-        BerlinBot().run_loop()
-    except NoSuchElementException as e:
-        logging.error(f"NoSuchElementException occurred: {str(e)}")
-        logging.info("Restarting the script in 10 seconds...")
-        time.sleep(10)
         BerlinBot().run_loop()
